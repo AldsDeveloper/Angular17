@@ -4,32 +4,103 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 const mysql = require('mysql');
-const db = mysql.createConnection({host:'127.0.0.1', user:'root', password:'frankent', database:'exams'});
-
-// db.connect((err) => {
-//   if (err) throw err;
-//   console.log('Connected to the database');
-// });
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+const db = mysql.createConnection({host:'127.0.0.1', user:'root', password:'frankent', database:'exams'});
+db.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to the database');
+});
+
+
+
 
 app.post('/submit/questions', (req, res) => {
-  const questions = req.body;
-  console.log('Received questions:', questions);
+  const { questions } = req.body;
 
-  const query = 'INSERT INTO questions (id, content) VALUES (1, ?) ON DUPLICATE KEY UPDATE content = ?';
-  const values = [JSON.stringify(questions), JSON.stringify(questions)];
+  if (!questions || !Array.isArray(questions)) {
+    return res.status(400).json({ error: 'Invalid questions data' });
+  }
+  const values = questions.map((question) => [question.id, question.content, question.isCode ? 1 : 0]);
 
-  db.query(query, values, (err, result) => {
-    if (err) throw err;
-    console.log('Questions saved or updated in database');
-    res.status(200).json({ message: 'Questions received and saved or updated' });
+  const sql = 'INSERT INTO questions (id, content, code) VALUES ? ON DUPLICATE KEY UPDATE content = VALUES(content), code = VALUES(code)';
+
+  db.query(sql, [values], (err, result) => {
+    if (err) {
+      console.error('Error updating questions: ' + err.stack);
+      return res.status(500).json({ error: 'Failed to update questions' });
+    }
+    res.status(200).json({ message: 'Questions updated successfully' });
   });
 });
 
+app.put('/update/question/:id', (req, res) => {
+  const questionId = req.params.id;
+  const { isCode } = req.body;
+
+  const sql = 'UPDATE questions SET code = ? WHERE id = ?';
+  db.query(sql, [isCode ? 1 : 0, questionId], (err, result) => {
+    if (err) {
+      console.error('Error updating question: ' + err.stack);
+      return res.status(500).json({ error: 'Failed to update question' });
+    }
+    res.status(200).json({ message: 'Question updated successfully' });
+  });
+});
+
+
+
+app.delete('/delete/question/:id', (req, res) => {
+  const questionId = req.params.id;
+
+  const sql = 'DELETE FROM questions WHERE id = ?';
+
+  db.query(sql, [questionId], (err, result) => {
+    if (err) {
+      console.error('Error deleting question: ' + err.stack);
+      return res.status(500).json({ error: 'Failed to delete question' });
+    }
+    res.status(200).json({ message: 'Question deleted successfully' });
+  });
+});
+
+
+// const multer = require('multer');
+// const path = require('path');
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'src/assets/public/uploads');
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const imageFilter = function (req, file, cb) {
+//   if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+//     return cb(new Error('Only image files are allowed!'), false);
+//   }
+//   cb(null, true);
+// };
+
+// const upload = multer({ storage: storage, fileFilter: imageFilter });
+
+// app.post('/upload', upload.single('image'), (req, res) => {
+//   if (req.file) {
+//     return res.status(200).json({ imageUrl: 'http://localhost:4200/' + req.file.path });
+//   } else {
+//     return res.status(400).json({ error: 'Failed to upload image' });
+//   }
+// });
+
+
+
+
 app.post('/fetch/questions', (req, res) => {
-  const query = 'SELECT * FROM questions WHERE id = 1';
+  const query = 'SELECT * FROM questions';
 
   db.query(query, (err, results) => {
     if (err) throw err;
@@ -37,6 +108,33 @@ app.post('/fetch/questions', (req, res) => {
     res.json(results);
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.post('/submit/answers', (req, res) => {
   const { userId, answers } = req.body;

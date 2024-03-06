@@ -4,11 +4,13 @@ import { Router, RouterLink, RouterLinkActive,ActivatedRoute } from '@angular/ro
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+// import { BrowserModule } from '@angular/platform-browser';
 import { EditorModule } from '@tinymce/tinymce-angular'
 import { ChangeDetectorRef } from '@angular/core';
 
 
+import { ViewChild } from '@angular/core';
+import { EditorComponent } from '@tinymce/tinymce-angular';
 
 @Component({
   selector: 'app-define',
@@ -20,13 +22,95 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 
 export class DefineComponent implements OnInit {
-  questions: { question: string }[] = [];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  questions: {
+isCode: any; id: number, content: string, code: number
+}[] = [];
+
+  @ViewChild(EditorComponent, { static: false }) editorComponent!: EditorComponent;
+
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.questions.push({ question: '' });
+    this.questions.push({
+      id: 0, content: '', code: 0,
+      isCode: undefined
+    });
+    this.getQuestions();
+    console.log(this.questions);
   }
+
+
+  getQuestions(): void {
+    this.http.post('http://localhost:3000/fetch/questions', {}).subscribe((data: any) => {
+      this.questions = data;
+      console.log(this.questions);
+      if (this.questions.length > 0) {
+        this.editorComponent.editor.setContent(this.questions[0].content);
+      }
+    });
+  }
+
+
+
+  onCheckboxChange(event: any, index: number): void {
+    const isChecked = event.target.checked;
+    this.questions[index].isCode = isChecked;
+    const questionId = this.questions[index].id;
+
+    this.http.put(`http://localhost:3000/update/question/${questionId}`, { isCode: isChecked }).subscribe((response) => {
+      console.log(response);
+      alert('Question updated successfully');
+    }, (error) => {
+      console.error(error);
+      alert('Failed to update question');
+    });
+  }
+
+
+  addQuestion(): void {
+    if (this.questions.length === 0 || this.questions[this.questions.length - 1].content !== '') {
+      const newQuestion = { id: this.questions.length + 1, content: '', code: 0, isCode: undefined };
+      this.questions.push(newQuestion);
+      this.cdr.detectChanges();
+    }
+  }
+
+
+  deleteQuestion(index: number): void {
+    if (this.questions.length === 1) {
+      // Show alert message or disable delete button
+      alert('Cannot delete the last question.');
+      return;
+    }
+
+    const questionToDelete = this.questions[index];
+    const questionIdToDelete = questionToDelete.id;
+
+    console.log('Deleting question:', questionToDelete.content);
+    this.questions.splice(index, 1);
+
+    this.http.delete(`http://localhost:3000/delete/question/${questionIdToDelete}`).subscribe((response) => {
+      console.log(response);
+      alert('Deleting question successfully');
+    }, (error) => {
+      console.error(error);
+      alert('Failed to delete question');
+    });
+  }
+
+
+
+  submitForm(): void {
+    this.http.post('http://localhost:3000/submit/questions', { questions: this.questions }).subscribe((response) => {
+      console.log(response);
+      alert('Form submitted successfully');
+    }, (error) => {
+      console.error(error);
+      alert('Failed to submit form');
+    });
+  }
+
 
 
   ngAfterViewInit(): void {
@@ -34,15 +118,6 @@ export class DefineComponent implements OnInit {
   }
 
 
-  addQuestion(): void {
-    this.questions.push({ question: '' });
-    this.cdr.detectChanges();
-  }
-
-
-  submitForm(): void {
-    alert('Form submitted');
-  }
 
   editorConfig = {
     height: 300,

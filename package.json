@@ -27,6 +27,7 @@
     "@txtextcontrol/tx-ng-document-editor": "^32.1.0",
     "angular-froala-wysiwyg": "^4.1.4",
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.18.3",
     "font-awesome": "^4.7.0",
     "froala-editor": "^4.1.4",
