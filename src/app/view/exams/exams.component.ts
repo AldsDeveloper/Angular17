@@ -11,9 +11,9 @@ import { FooterComponent } from '../../components/footer/footer.component';
 @Component({
   selector: 'app-exams',
   standalone: true,
-  imports: [FooterComponent, CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [FooterComponent,CommonModule,RouterLink, RouterLinkActive,FormsModule],
   templateUrl: './exams.component.html',
-  styleUrls: ['./exams.component.css']
+  styleUrl: './exams.component.css'
 })
 
 export class ExamsComponent implements OnInit {
@@ -27,7 +27,8 @@ export class ExamsComponent implements OnInit {
 
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId')!;
-    console.log(this.userId);
+    console.log();
+
     this.getQuestions();
   }
   getQuestions(): void {

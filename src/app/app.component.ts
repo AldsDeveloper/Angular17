@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
-// Import Angular plugin.
-import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+
 
 @Component({
   selector: 'app-root',

@@ -1,18 +1,17 @@
 import { Component, OnInit ,NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive,ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { Router, RouterLink, RouterLinkActive, ActivatedRoute,RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-define',
   standalone: true,
-  imports: [FroalaEditorModule,FroalaViewModule],
+  imports: [FormsModule,RouterOutlet,CommonModule],
   templateUrl: './define.component.html',
-  styleUrl: './define.component.css'
 })
 export class DefineComponent {
-
+  
 }
+
