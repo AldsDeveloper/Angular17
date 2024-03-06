@@ -16,7 +16,7 @@ export class IndexComponent {
   constructor(private router: Router, private http: HttpClient) {}
 
   userId: string = '';
-  
+
   getStarted(): void {
     if (!this.userId) {
       alert('Please enter your ID');
