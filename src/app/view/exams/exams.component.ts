@@ -33,14 +33,20 @@ export class ExamsComponent implements OnInit {
   }
   getQuestions(): void {
     this.http.post('http://localhost:3000/fetch/questions', {}).subscribe((data: any) => {
-      if (data.length > 0) {
-        this.questions = JSON.parse(data[0].content).map((q: any) => ({
-          question: q.content,
-          answer: ''
-        }));
+      if (data.length > 0 && typeof data[0].content === 'string') {
+        try {
+          const questions = JSON.parse(data[0].content).map((q: any) => ({
+            question: q.content,
+            answer: ''
+          }));
+          this.questions = questions;
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
       }
     });
   }
+
 
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
