@@ -68,11 +68,21 @@ isCode: any; id: number, content: string, code: number
 
 
   addQuestion(): void {
-    if (this.questions.length === 0 || this.questions[this.questions.length - 1].content !== '') {
-      const newQuestion = { id: this.questions.length + 1, content: '', code: 0, isCode: undefined };
-      this.questions.push(newQuestion);
-      this.cdr.detectChanges();
-    }
+    const newId = this.questions.length > 0 ? Math.max(...this.questions.map(q => q.id)) + 1 : 1;
+    const newQuestion = { id: newId, content: '', code: 0, isCode: false };
+    this.questions.push(newQuestion);
+    this.cdr.detectChanges();
+  }
+
+
+  submitForm(): void {
+    this.http.post('http://localhost:3000/submit/questions', { questions: this.questions }).subscribe((response) => {
+      console.log(response);
+      alert('Form submitted successfully');
+    }, (error) => {
+      console.error(error);
+      alert('Failed to submit form');
+    });
   }
 
 
@@ -99,15 +109,6 @@ isCode: any; id: number, content: string, code: number
   }
 
 
-  submitForm(): void {
-    this.http.post('http://localhost:3000/submit/questions', { questions: this.questions }).subscribe((response) => {
-      console.log(response);
-      alert('Form submitted successfully');
-    }, (error) => {
-      console.error(error);
-      alert('Failed to submit form');
-    });
-  }
 
 
   ngAfterViewInit(): void {

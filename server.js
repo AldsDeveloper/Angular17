@@ -23,6 +23,7 @@ app.post('/submit/questions', (req, res) => {
   if (!questions || !Array.isArray(questions)) {
     return res.status(400).json({ error: 'Invalid questions data' });
   }
+  
   const values = questions.map((question) => [question.id, question.content, question.isCode ? 1 : 0]);
 
   const sql = 'INSERT INTO questions (id, content, code) VALUES ? ON DUPLICATE KEY UPDATE content = VALUES(content), code = VALUES(code)';
@@ -96,9 +97,6 @@ app.delete('/delete/question/:id', (req, res) => {
 //   }
 // });
 
-
-
-
 app.post('/fetch/questions', (req, res) => {
   const query = 'SELECT * FROM questions';
 
@@ -108,33 +106,6 @@ app.post('/fetch/questions', (req, res) => {
     res.json(results);
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 app.post('/submit/answers', (req, res) => {
   const { userId, answers } = req.body;
