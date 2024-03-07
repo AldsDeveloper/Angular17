@@ -4,19 +4,30 @@ import { Router, RouterLink, RouterLinkActive,ActivatedRoute } from '@angular/ro
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { AfterViewInit } from '@angular/core';
+import { EditorModule } from '@tinymce/tinymce-angular'
+import { ChangeDetectorRef } from '@angular/core';
+import { EditorComponent } from '@tinymce/tinymce-angular';
+import { ViewChild } from '@angular/core';
+
 // Components
 import { IndexComponent } from '../index/index.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 
+
+
 @Component({
   selector: 'app-exams',
   standalone: true,
-  imports: [FooterComponent,CommonModule,RouterLink, RouterLinkActive,FormsModule],
+  imports: [FooterComponent,CommonModule,RouterLink, RouterLinkActive,FormsModule, EditorModule,CommonModule],
   templateUrl: './exams.component.html',
   styleUrl: './exams.component.css'
 })
 
 export class ExamsComponent implements OnInit {
+
+  @ViewChild(EditorComponent, { static: false }) editorComponent!: EditorComponent;
+
   unansweredIndex: number = -1;
   questions: { question: string; answer: string }[] = [{ question: '', answer: '' }];
   userId!: string;
@@ -28,22 +39,18 @@ export class ExamsComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.route.snapshot.paramMap.get('userId')!;
     console.log();
-
     this.getQuestions();
   }
   getQuestions(): void {
     this.http.post('http://localhost:3000/fetch/questions', {}).subscribe((data: any) => {
-      if (data.length > 0 && typeof data[0].content === 'string') {
-        try {
-          const questions = JSON.parse(data[0].content).map((q: any) => ({
-            question: q.content,
-            answer: ''
-          }));
-          this.questions = questions;
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
-      }
+      this.questions = data.map((question: any) => {
+        return {
+          id: question.id,
+          question: question.question,
+          answer: '',
+        };
+      });
+      console.log(this.questions);
     });
   }
 

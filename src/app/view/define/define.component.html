@@ -18,9 +18,8 @@
                     </div>
                     <div class="flex items-center justify-end px-4 py-2 border-t">
                       <div class="flex items-center me-4">
-                        <!-- <input id="check-code{{i}}" type="checkbox" [(ngModel)]="question.isCode" class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"> -->
-                        <input id="check-code{{i}}" type="checkbox" [ngModel]="question.isCode" (onChange)="onCheckboxChange($event, i)" class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="check-code{{i}}" class="text-sm font-medium text-gray-900 ms-2 dark:text-gray-300">Answer Code คำตอบต้องเป็น Code</label>
+                        <input id="check-code{{i}}" type="checkbox" [ngModel]="question.isCode" (change)="onCheckboxChange($event, i)" class="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="check-code{{i}}" class="text-sm font-medium text-gray-900 ms-2 dark:text-gray-300">คำตอบต้องเป็น Code</label>
                       </div>
                       <button class="px-4 py-2 ml-2 text-xs font-bold text-white uppercase transition-all duration-150 ease-linear bg-red-500 rounded shadow outline-none active:bg-red-700 hover:shadow-md focus:outline-none" type="button" (click)="deleteQuestion(i)">Delete</button>
                     </div>

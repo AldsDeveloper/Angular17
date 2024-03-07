@@ -52,7 +52,6 @@ isCode: any; id: number, content: string, code: number
   }
 
 
-
   onCheckboxChange(event: any, index: number): void {
     const isChecked = event.target.checked;
     this.questions[index].isCode = isChecked;
@@ -100,7 +99,6 @@ isCode: any; id: number, content: string, code: number
   }
 
 
-
   submitForm(): void {
     this.http.post('http://localhost:3000/submit/questions', { questions: this.questions }).subscribe((response) => {
       console.log(response);
@@ -110,7 +108,6 @@ isCode: any; id: number, content: string, code: number
       alert('Failed to submit form');
     });
   }
-
 
 
   ngAfterViewInit(): void {
