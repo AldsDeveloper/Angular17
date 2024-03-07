@@ -15,45 +15,38 @@ import { IndexComponent } from '../index/index.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 
 
+import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
 
 @Component({
   selector: 'app-exams',
   standalone: true,
-  imports: [FooterComponent,CommonModule,RouterLink, RouterLinkActive,FormsModule, EditorModule,CommonModule],
+  imports: [FooterComponent,CommonModule,RouterLink, RouterLinkActive,FormsModule,CommonModule],
   templateUrl: './exams.component.html',
   styleUrl: './exams.component.css'
 })
 
 export class ExamsComponent implements OnInit {
 
-  @ViewChild(EditorComponent, { static: false }) editorComponent!: EditorComponent;
-
   unansweredIndex: number = -1;
   questions: { question: string; answer: string }[] = [{ question: '', answer: '' }];
-  userId!: string;
+  userId: any;
   currentQuestionIndex: number = 0;
   isSubmitted: boolean = false;
 
   constructor(private route: ActivatedRoute, private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.userId = this.route.snapshot.paramMap.get('userId')!;
-    console.log();
+    this.userId = this.route.snapshot.paramMap.get('userId');
     this.getQuestions();
+    console.log(this.userId);
   }
+
   getQuestions(): void {
     this.http.post('http://localhost:3000/fetch/questions', {}).subscribe((data: any) => {
-      this.questions = data.map((question: any) => {
-        return {
-          id: question.id,
-          question: question.question,
-          answer: '',
-        };
-      });
+      this.questions = data.map((q: any) => ({ question: q.content, answer: '' }));
       console.log(this.questions);
     });
   }
-
 
   goToNextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
@@ -81,10 +74,14 @@ export class ExamsComponent implements OnInit {
       };
 
       this.http.post('http://localhost:3000/submit/answers', payload).subscribe(response => {
+        console.log('Server response:', response);
         alert('Form submitted!');
       }, error => {
+        console.error('Error submitting form:', error);
         alert('Error submitting form!');
       });
     }
   }
+
+
 }
